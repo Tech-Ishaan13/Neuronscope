@@ -76,7 +76,10 @@ ftxui::Element AttentionPanel::Render() {
     // Header row of tokens
     Elements top_tokens = { text("          ") }; // padding for y-axis token names
     for (int x = viewport_x_; x < std::min(viewport_x_ + view_size, seq_len); ++x) {
-        top_tokens.push_back(text("[" + tokens_[x] + "] ") | bold | color(Theme::TextWhite) | size(WIDTH, EQUAL, 10));
+        std::string tok = tokens_[x];
+        if (tok.size() > 3) tok = tok.substr(0, 3);
+        while (tok.size() < 3) tok += " ";
+        top_tokens.push_back(text(tok + " ") | bold | color(Theme::TextWhite) | size(WIDTH, EQUAL, 4));
     }
     grid_rows.push_back(hbox(std::move(top_tokens)));
 
@@ -138,8 +141,8 @@ ftxui::Element AttentionPanel::Render() {
                 }
                 default: { // Sparse semantic — complex wavy pattern
                     float raw = std::sin((float)x * (0.8f + 0.15f * head) +
-                                        (float)y * (1.3f + 0.20f * head) +
-                                        (float)layer * 2.1f);
+                                         (float)y * (1.3f + 0.20f * head) +
+                                         (float)layer * 2.1f);
                     weight = std::max(0.0f, (raw + 1.0f) / 2.0f - 0.10f);
                     // boost near-diagonal slightly for readability
                     if (std::abs(x - y) <= 1) weight = std::min(1.0f, weight + 0.25f);
@@ -151,7 +154,7 @@ ftxui::Element AttentionPanel::Render() {
             if (weight > 1.0f) weight = 1.0f;
 
             const char* glyph = get_block_char(weight, contrast_scale_);
-            row_els.push_back(text(glyph) | color(heat_color) | size(WIDTH, EQUAL, 10) | center);
+            row_els.push_back(text(glyph) | color(heat_color) | size(WIDTH, EQUAL, 4) | center);
         }
         grid_rows.push_back(hbox(std::move(row_els)));
     }
@@ -175,7 +178,7 @@ ftxui::Element AttentionPanel::Render() {
         separator(),
         vbox(std::move(grid_rows)) | flex,
         separator(),
-        text("[Arrows/h,j,k,l: Pan | +/-: Adjust Contrast | H: Cycle Head | F: Fullscreen]") | color(Theme::TextDim) | size(HEIGHT, EQUAL, 1)
+        text("[Press '3' to Focus | h,j,k,l/Arrows: Pan | +/-: Contrast | H: Head | F: Fullscreen]") | color(Theme::TextDim) | size(HEIGHT, EQUAL, 1)
     }) | Theme::StyledBorder(Focused());
 }
 
