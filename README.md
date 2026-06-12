@@ -30,8 +30,8 @@ src/
 │   ├── transformer.h            # Transformer model simulation
 │   └── transformer.cpp          # Inference engine with telemetry emission
 ├── ipc/
-│   ├── shared_memory_channel.cpp # (Stub) Shared memory transport
-│   └── control_pipe.cpp          # (Stub) Control pipe transport
+│   ├── shared_memory_channel.cpp # Shared memory SPSC ring buffer mapping
+│   └── control_pipe.cpp          # Named pipe/FIFO control channel
 ├── tui/
 │   ├── app.h / app.cpp          # Main application + FTXUI event loop
 │   ├── theme.h                  # Color palette & border decorators
