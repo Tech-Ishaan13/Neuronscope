@@ -64,10 +64,11 @@ ftxui::Element AttentionPanel::Render() {
     if (heads <= 0) heads = 1;
     head_index_ = head_index_ % heads;
 
-    // Viewport clamp
-    int view_size = 12; // 12x12 grid visible
-    viewport_x_ = std::max(0, std::min(viewport_x_, seq_len - view_size));
-    viewport_y_ = std::max(0, std::min(viewport_y_, seq_len - view_size));
+    // Viewport clamp — view_size now larger since panel has full right-column height
+    int view_size = std::min(16, seq_len); // up to 16x16 grid visible
+    int max_vp = std::max(0, seq_len - view_size);
+    viewport_x_ = std::max(0, std::min(viewport_x_, max_vp));
+    viewport_y_ = std::max(0, std::min(viewport_y_, max_vp));
 
     // Render Grid
     Elements grid_rows;
@@ -188,7 +189,8 @@ bool AttentionPanel::OnEvent(ftxui::Event event) {
         return true;
     }
     if (event == ftxui::Event::ArrowRight || event == ftxui::Event::Character('l')) {
-        viewport_x_ = std::min(seq_len - 8, viewport_x_ + 1);
+        int view_size = std::min(16, seq_len);
+        viewport_x_ = std::min(std::max(0, seq_len - view_size), viewport_x_ + 1);
         return true;
     }
     if (event == ftxui::Event::ArrowUp || event == ftxui::Event::Character('k')) {
@@ -196,7 +198,8 @@ bool AttentionPanel::OnEvent(ftxui::Event event) {
         return true;
     }
     if (event == ftxui::Event::ArrowDown || event == ftxui::Event::Character('j')) {
-        viewport_y_ = std::min(seq_len - 8, viewport_y_ + 1);
+        int view_size = std::min(16, seq_len);
+        viewport_y_ = std::min(std::max(0, seq_len - view_size), viewport_y_ + 1);
         return true;
     }
     if (event == ftxui::Event::Character('+') || event == ftxui::Event::Character('=')) {

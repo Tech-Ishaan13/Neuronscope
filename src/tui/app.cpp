@@ -179,9 +179,14 @@ void App::setup_model_hooks() {
 void App::setup_layout() {
     using namespace ftxui;
 
-    auto top_row = Container::Horizontal({
+    auto left_col = Container::Vertical({
         topology_panel_,
         packet_stream_panel_
+    });
+
+    auto top_row = Container::Horizontal({
+        left_col,
+        attention_panel_
     });
 
     auto bottom_row = Container::Horizontal({
@@ -191,7 +196,6 @@ void App::setup_layout() {
 
     main_container_ = Container::Vertical({
         top_row,
-        attention_panel_,
         bottom_row
     });
 
@@ -276,20 +280,39 @@ void App::setup_layout() {
             });
         }
 
+        // New layout:
+        //  ┌─────────────┬─────────────────────────────┐
+        //  │  1. Topology│                              │
+        //  │   (top-left)│   3. Attention Matrix        │
+        //  ├─────────────│      (full right column)     │
+        //  │  2. Packets │                              │
+        //  │ (bot-left)  │                              │
+        //  ├─────────────┴──────────┬────────────────── ┤
+        //  │   4. Metrics           │  5. Anomaly Ledger│
+        //  └────────────────────────┴───────────────────┘
+
+        auto left_col = vbox({
+            topology_panel_->Render() | flex,
+            separator(),
+            packet_stream_panel_->Render() | flex
+        }) | size(WIDTH, EQUAL, 55);
+
+        auto right_col = attention_panel_->Render() | flex;
+
+        auto bottom_row = hbox({
+            metrics_panel_->Render() | flex,
+            separator(),
+            anomaly_panel_->Render() | flex
+        }) | size(HEIGHT, EQUAL, 10);
+
         auto workspace = vbox({
             hbox({
-                topology_panel_->Render() | flex_grow | size(WIDTH, GREATER_THAN, 40),
+                left_col,
                 separator(),
-                packet_stream_panel_->Render() | flex_grow | size(WIDTH, GREATER_THAN, 60)
+                right_col
             }) | flex,
             separator(),
-            attention_panel_->Render() | size(HEIGHT, EQUAL, 10),
-            separator(),
-            hbox({
-                metrics_panel_->Render() | flex,
-                separator(),
-                anomaly_panel_->Render() | flex
-            }) | size(HEIGHT, EQUAL, 9)
+            bottom_row
         });
 
         return vbox({
