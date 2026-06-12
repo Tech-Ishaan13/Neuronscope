@@ -128,7 +128,8 @@ ftxui::Element PacketStreamPanel::Render() {
     if (records_.empty()) {
         return vbox({
             hbox({
-                text(" 2. LIVE PACKET STREAM ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                text(" 2. LIVE PACKET STREAM") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                text(" [Enter: Freeze/Resume | Bksp: Clear Filter]") | color(Theme::TextDim),
                 filler()
             }),
             separator(),
@@ -154,10 +155,9 @@ ftxui::Element PacketStreamPanel::Render() {
     std::string footer_txt;
     if (!layer_filter_.empty()) {
         footer_txt = "[Filter: " + layer_filter_ + "]  ";
-        footer_txt += autoscroll_ ? "[Autoscroll: ON | Enter to Freeze]" : "[Autoscroll: OFF | Enter to Resume]";
-        footer_txt += "  [Backspace: Clear Filter]";
+        footer_txt += autoscroll_ ? "[Autoscroll: ON]" : "[Autoscroll: OFF]";
     } else {
-        footer_txt = autoscroll_ ? "[Autoscroll: ON | Enter to Freeze | Arrow keys to scroll]" : "[Autoscroll: OFF | Enter to Resume]";
+        footer_txt = autoscroll_ ? "[Autoscroll: ON]" : "[Autoscroll: OFF]";
     }
 
     if (visible_indices.empty()) {
@@ -166,7 +166,8 @@ ftxui::Element PacketStreamPanel::Render() {
             : "No packets for layer: " + layer_filter_;
         return vbox({
             hbox({
-                text(" 2. LIVE PACKET STREAM ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                text(" 2. LIVE PACKET STREAM") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                text(" [Enter: Freeze/Resume | Bksp: Clear Filter]") | color(Theme::TextDim),
                 filler()
             }),
             separator(),
@@ -247,7 +248,8 @@ ftxui::Element PacketStreamPanel::Render() {
 
     return vbox({
         hbox({
-            text(" 2. LIVE PACKET STREAM ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            text(" 2. LIVE PACKET STREAM") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            text(" [Enter: Freeze/Resume | Bksp: Clear Filter]") | color(Theme::TextDim),
             filler()
         }),
         separator(),

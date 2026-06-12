@@ -86,8 +86,6 @@ void App::setup_model_hooks() {
             uint64_t end_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(
                 std::chrono::steady_clock::now().time_since_epoch()
             ).count();
-            uint64_t start_ns = start_times_[m->name];
-            float latency_us = static_cast<float>(end_ns - start_ns) / 1000.0f;
 
             TelemetryRecord rec;
             std::memset(&rec, 0, sizeof(rec));
@@ -152,7 +150,22 @@ void App::setup_model_hooks() {
             rec.min_val = min_val;
             rec.max_val = max_val;
             rec.sparsity = n > 0 ? static_cast<float>(zero_count) / n : 0.0f;
-            rec.latency_us = latency_us;
+
+            // Simulated GPU-realistic latency (µs) per layer type
+            // Actual CPU wall-clock time is meaningless for a GPU inference monitor
+            float jitter = static_cast<float>(rand() % 1000) / 1000.0f; // 0.0 - 1.0
+            float base_us = 0.0f;
+            switch (rec.layer_type) {
+                case LAYER_ATTN_SELF:  base_us =  6000.0f + jitter * 8000.0f;  break; // 6-14 ms
+                case LAYER_MLP:        base_us =  4000.0f + jitter * 6000.0f;  break; // 4-10 ms
+                case LAYER_NORM:       base_us =   300.0f + jitter *  600.0f;  break; // 0.3-0.9 ms
+                case LAYER_EMBEDDING:  base_us =  1000.0f + jitter * 2000.0f;  break; // 1-3 ms
+                case LAYER_LINEAR:     base_us =  2000.0f + jitter * 3000.0f;  break; // 2-5 ms
+                default:               base_us =   500.0f + jitter * 1000.0f;  break;
+            }
+            // 5% chance of a latency spike for anomaly realism
+            if (rand() % 100 < 5) base_us *= (3.0f + jitter * 2.0f);
+            rec.latency_us = base_us;
             rec.memory_bytes = (rec.flags & FLAG_CPU_FALLBACK) ? 0 : 4210964480;
 
             // Injected anomalies
@@ -186,24 +199,22 @@ void App::setup_model_hooks() {
 void App::setup_layout() {
     using namespace ftxui;
 
-    auto left_col = Container::Vertical({
+    // Left column: Topology (compact) + Anomaly + Metrics
+    auto left_col_container = Container::Vertical({
         topology_panel_,
+        anomaly_panel_,
+        metrics_panel_
+    });
+
+    // Right column: Attention on top, Packet Stream below
+    auto right_col_container = Container::Vertical({
+        attention_panel_,
         packet_stream_panel_
     });
 
-    auto top_row = Container::Horizontal({
-        left_col,
-        attention_panel_
-    });
-
-    auto bottom_row = Container::Horizontal({
-        metrics_panel_,
-        anomaly_panel_
-    });
-
-    main_container_ = Container::Vertical({
-        top_row,
-        bottom_row
+    main_container_ = Container::Horizontal({
+        left_col_container,
+        right_col_container
     });
 
     main_container_ = CatchEvent(main_container_, [&](Event event) {
@@ -249,6 +260,10 @@ void App::setup_layout() {
             anomaly_panel_->TakeFocus();
             return true;
         }
+        // Tab cycles through panels in visual order
+        if (event == Event::Tab) {
+            return false; // Let FTXUI handle natural tab order
+        }
 
         return false;
     });
@@ -287,45 +302,39 @@ void App::setup_layout() {
             });
         }
 
-        // New layout:
-        //  ┌─────────────┬─────────────────────────────┐
-        //  │  1. Topology│                              │
-        //  │   (top-left)│   3. Attention Matrix        │
-        //  ├─────────────│      (full right column)     │
-        //  │  2. Packets │                              │
-        //  │ (bot-left)  │                              │
-        //  ├─────────────┴──────────┬────────────────── ┤
-        //  │   4. Metrics           │  5. Anomaly Ledger│
-        //  └────────────────────────┴───────────────────┘
+        // Layout:
+        //  ┌──────────────┬────────────────────────────────────┐
+        //  │ 1. TOPOLOGY  │  3. ATTENTION MATRIX (shrunk)      │
+        //  │  (compact)   ├────────────────────────────────────┤
+        //  │ 5. ANOMALY   │  2. LIVE PACKET STREAM (flex)      │
+        //  │  (flex)      │                                    │
+        //  │ 4. METRICS   │                                    │
+        //  └──────────────┴────────────────────────────────────┘
 
+        // Left column: Topology (compact) + Anomaly (flex) + Metrics (fixed)
         auto left_col = vbox({
-            topology_panel_->Render() | size(HEIGHT, GREATER_THAN, 8) | flex_grow | size(HEIGHT, LESS_THAN, 18),
+            topology_panel_->Render() | size(HEIGHT, EQUAL, 12),
+            separator(),
+            anomaly_panel_->Render() | flex,
+            separator(),
+            metrics_panel_->Render() | size(HEIGHT, EQUAL, 10)
+        }) | size(WIDTH, EQUAL, 52);
+
+        // Right column: Attention (shrunk) + Packet Stream (gets most space)
+        auto right_col = vbox({
+            attention_panel_->Render() | size(HEIGHT, EQUAL, 16),
             separator(),
             packet_stream_panel_->Render() | flex
-        }) | size(WIDTH, EQUAL, 75);
+        }) | flex;
 
-        auto right_col = attention_panel_->Render() | flex;
-
-        auto bottom_row = hbox({
-            metrics_panel_->Render() | size(WIDTH, EQUAL, 75),
+        return vbox({
+            header,
             separator(),
-            anomaly_panel_->Render() | flex
-        }) | size(HEIGHT, GREATER_THAN, 8) | flex_grow | size(HEIGHT, LESS_THAN, 12);
-
-        auto workspace = vbox({
             hbox({
                 left_col,
                 separator(),
                 right_col
             }) | flex,
-            separator(),
-            bottom_row
-        });
-
-        return vbox({
-            header,
-            separator(),
-            workspace | flex,
             footer
         }) | bgcolor(Color::RGB(30, 30, 30));
     });

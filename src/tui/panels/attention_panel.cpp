@@ -54,7 +54,7 @@ ftxui::Element AttentionPanel::Render() {
     if (!has_record_ || !(current_record_.flags & FLAG_HAS_ATTN)) {
         return vbox({
             hbox({
-                text(" 3. ATTENTION MATRIX VISUALIZER ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                text(" 3. ATTENTION MATRIX VISUALIZER (Arrows/h,j,k,l: Pan | +/-: Contrast | H: Head | F: Fullscreen) ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
                 filler()
             }),
             separator(),
@@ -177,7 +177,7 @@ ftxui::Element AttentionPanel::Render() {
 
     return vbox({
         hbox({
-            text(" 3. ATTENTION MATRIX VISUALIZER ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            text(" 3. ATTENTION MATRIX VISUALIZER (Arrows/h,j,k,l: Pan | +/-: Contrast | H: Head | F: Fullscreen) ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
             filler()
         }),
         separator(),
@@ -187,9 +187,7 @@ ftxui::Element AttentionPanel::Render() {
             text(status_ss.str()) | color(Theme::TextWhite)
         }),
         separator(),
-        vbox(std::move(grid_rows)) | flex,
-        separator(),
-        text(" [Arrows/h,j,k,l: Pan | +/-: Adjust Contrast | H: Cycle Head | F: Fullscreen]") | color(Theme::TextDim)
+        vbox(std::move(grid_rows)) | flex
     }) | Theme::StyledBorder(Focused());
 }
 

@@ -31,7 +31,8 @@ ftxui::Element AnomalyPanel::Render() {
             : "No anomalies detected for layer: " + layer_filter_;
         return vbox({
             hbox({
-                text(" 5. NUMERICAL ANOMALY LEDGER ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                text(" 5. ANOMALY LEDGER") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                text(" [a: Autoscroll | j/k: Scroll]") | color(Theme::TextDim),
                 filler()
             }),
             separator(),
@@ -86,14 +87,15 @@ ftxui::Element AnomalyPanel::Render() {
         items.push_back(item);
     }
 
-    std::string footer_txt = autoscroll_ ? "[Autoscroll: ON | Press Arrow keys to scroll]" : "[Autoscroll: OFF | Press 'a' for autoscroll]";
+    std::string footer_txt = autoscroll_ ? "[Autoscroll: ON]" : "[Autoscroll: OFF]";
     if (!layer_filter_.empty()) {
         footer_txt += " [Filtered]";
     }
 
     return vbox({
         hbox({
-            text(" 5. NUMERICAL ANOMALY LEDGER ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            text(" 5. ANOMALY LEDGER") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            text(" [a: Autoscroll | j/k: Scroll]") | color(Theme::TextDim),
             filler()
         }),
         separator(),

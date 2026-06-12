@@ -76,13 +76,12 @@ ftxui::Element TopologyPanel::Render() {
 
     return vbox({
         hbox({
-            text(" 1. MODEL TOPOLOGY ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            text(" 1. MODEL TOPOLOGY") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            text(" [j/k: Nav | Spc: Expand | Enter: Capture]") | color(Theme::TextDim),
             filler()
         }),
         separator(),
-        vbox(std::move(items)) | frame | flex | vscroll_indicator,
-        separator(),
-        text(" [j/k: Navigate | Space: Expand | Enter: Capture]") | color(Theme::TextDim)
+        vbox(std::move(items)) | frame | flex | vscroll_indicator
     }) | Theme::StyledBorder(Focused());
 }
 
