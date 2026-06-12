@@ -1,0 +1,24 @@
+# Build artifacts
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.exp
+*.lib
+obj/
+build/
+
+# IDE files
+.vs/
+.vscode/
+*.suo
+*.user
+*.sln.docstates
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temp/scratch files
+run_out.txt
+read_log.py
