@@ -160,9 +160,9 @@ void App::setup_model_hooks() {
             if (rec.layer_type == LAYER_ATTN_SELF) {
                 rec.flags |= FLAG_HAS_ATTN;
                 rec.attn_num_heads = 32;
-                rec.attn_seq_len = 64;
-                for (int y = 0; y < 64; ++y) {
-                    for (int x = 0; x < 64; ++x) {
+                rec.attn_seq_len = 8;
+                for (int y = 0; y < 8; ++y) {
+                    for (int x = 0; x < 8; ++x) {
                         float dist = std::abs(x - y);
                         float w = std::exp(-dist) / 2.0f;
                         if (x == y) w = 0.8f;
@@ -292,7 +292,7 @@ void App::setup_layout() {
         //  └────────────────────────┴───────────────────┘
 
         auto left_col = vbox({
-            topology_panel_->Render() | size(HEIGHT, EQUAL, 18),
+            topology_panel_->Render() | size(HEIGHT, EQUAL, 10),
             separator(),
             packet_stream_panel_->Render() | flex
         }) | size(WIDTH, EQUAL, 75);
@@ -303,7 +303,7 @@ void App::setup_layout() {
             metrics_panel_->Render() | size(WIDTH, EQUAL, 75),
             separator(),
             anomaly_panel_->Render() | flex
-        }) | size(HEIGHT, EQUAL, 10);
+        }) | size(HEIGHT, EQUAL, 8);
 
         auto workspace = vbox({
             hbox({
@@ -326,9 +326,9 @@ void App::setup_layout() {
 
 void App::model_inference_loop() {
     Tensor input_tokens;
-    input_tokens.shape = { 1, 64 }; // simulated batch_size = 1, seq_len = 64
-    input_tokens.data.resize(64);
-    for (int i = 0; i < 64; ++i) {
+    input_tokens.shape = { 1, 8 }; // simulated batch_size = 1, seq_len = 8
+    input_tokens.data.resize(8);
+    for (int i = 0; i < 8; ++i) {
         input_tokens.data[i] = static_cast<float>(rand() % 32000);
     }
 
