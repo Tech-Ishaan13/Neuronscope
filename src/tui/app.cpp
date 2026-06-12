@@ -299,7 +299,7 @@ void App::setup_layout() {
         //  └────────────────────────┴───────────────────┘
 
         auto left_col = vbox({
-            topology_panel_->Render() | size(HEIGHT, EQUAL, 10),
+            topology_panel_->Render() | size(HEIGHT, GREATER_THAN, 8) | flex_grow | size(HEIGHT, LESS_THAN, 18),
             separator(),
             packet_stream_panel_->Render() | flex
         }) | size(WIDTH, EQUAL, 75);
@@ -310,7 +310,7 @@ void App::setup_layout() {
             metrics_panel_->Render() | size(WIDTH, EQUAL, 75),
             separator(),
             anomaly_panel_->Render() | flex
-        }) | size(HEIGHT, EQUAL, 8);
+        }) | size(HEIGHT, GREATER_THAN, 8) | flex_grow | size(HEIGHT, LESS_THAN, 12);
 
         auto workspace = vbox({
             hbox({
