@@ -56,6 +56,13 @@ bool App::init() {
         }
     });
 
+    // Apply default active target filter matching startup active target
+    std::string default_tgt = topology_.get_active_target();
+    if (!default_tgt.empty()) {
+        packet_stream_panel_->set_layer_filter(default_tgt);
+        anomaly_panel_->set_layer_filter(default_tgt);
+    }
+
     // 4. Set up interactive container layout
     setup_layout();
 

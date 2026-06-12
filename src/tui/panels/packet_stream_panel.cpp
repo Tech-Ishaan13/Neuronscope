@@ -127,7 +127,11 @@ ftxui::Element PacketStreamPanel::Render() {
 
     if (records_.empty()) {
         return vbox({
-            text("┌── 2. LIVE PACKET STREAM ────────────────────────────────────────────────────────┐") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+            hbox({
+                text(" 2. LIVE PACKET STREAM ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                filler()
+            }),
+            separator(),
             header,
             separator(),
             text("No packets received yet. Run python probe or mock generator.") | color(Theme::TextDim) | center | flex,
@@ -161,11 +165,16 @@ ftxui::Element PacketStreamPanel::Render() {
             ? "No packets received yet."
             : "No packets for layer: " + layer_filter_;
         return vbox({
-            text("┌── 2. LIVE PACKET STREAM ────────────────────────────────────────────────────────┐") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+            hbox({
+                text(" 2. LIVE PACKET STREAM ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                filler()
+            }),
+            separator(),
             header,
             separator(),
             text(msg) | color(Theme::TextDim) | center | flex,
-            text(footer_txt) | color(layer_filter_.empty() ? Theme::TextDim : Theme::AccentWarning) | size(HEIGHT, EQUAL, 1)
+            separator(),
+            text(" " + footer_txt) | color(layer_filter_.empty() ? Theme::TextDim : Theme::AccentWarning)
         }) | Theme::StyledBorder(Focused());
     }
 
@@ -237,11 +246,16 @@ ftxui::Element PacketStreamPanel::Render() {
     }
 
     return vbox({
-        text("┌── 2. LIVE PACKET STREAM ────────────────────────────────────────────────────────┐") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+        hbox({
+            text(" 2. LIVE PACKET STREAM ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            filler()
+        }),
+        separator(),
         header,
         separator(),
         vbox(std::move(rows)) | frame | flex | vscroll_indicator,
-        text(footer_txt) | color(layer_filter_.empty() ? Theme::TextDim : Theme::AccentWarning) | size(HEIGHT, EQUAL, 1)
+        separator(),
+        text(" " + footer_txt) | color(layer_filter_.empty() ? Theme::TextDim : Theme::AccentWarning)
     }) | Theme::StyledBorder(Focused());
 }
 

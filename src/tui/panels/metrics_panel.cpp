@@ -43,7 +43,11 @@ ftxui::Element MetricsPanel::Render() {
 
     if (!has_record_) {
         return vbox({
-            text("┌── 4. RUNTIME METRICS INSPECTOR ──────────────────────┐") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+            hbox({
+                text(" 4. RUNTIME METRICS INSPECTOR ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                filler()
+            }),
+            separator(),
             text("Select a packet in stream to inspect runtime metrics.") | color(Theme::TextDim) | center | flex
         }) | Theme::StyledBorder(Focused());
     }
@@ -75,7 +79,11 @@ ftxui::Element MetricsPanel::Render() {
     }
 
     return vbox({
-        text("┌── 4. RUNTIME METRICS INSPECTOR ──────────────────────┐") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+        hbox({
+            text(" 4. RUNTIME METRICS INSPECTOR ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            filler()
+        }),
+        separator(),
         vbox({
             hbox({ text(" Tensor Shape : ") | color(Theme::TextDim), text(shape_ss.str()) | bold | color(Theme::TextWhite), text("   Dtype: ") | color(Theme::TextDim), text(rec.dtype) | bold | color(Theme::TextWhite) }),
             hbox({ text(" Sparsity Rate: ") | color(Theme::TextDim), make_sparsity_gauge(rec.sparsity) }),

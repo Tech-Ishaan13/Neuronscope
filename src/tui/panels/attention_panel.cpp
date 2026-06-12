@@ -53,7 +53,11 @@ ftxui::Element AttentionPanel::Render() {
 
     if (!has_record_ || !(current_record_.flags & FLAG_HAS_ATTN)) {
         return vbox({
-            text("┌── 3. ATTENTION MATRIX VISUALIZER ────────────────────────────────────────────────────────────┐") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+            hbox({
+                text(" 3. ATTENTION MATRIX VISUALIZER ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                filler()
+            }),
+            separator(),
             text("Select an Attention layer in Topology / Packets to visualize attention weights.") | color(Theme::TextDim) | center | flex
         }) | Theme::StyledBorder(Focused());
     }
@@ -73,10 +77,14 @@ ftxui::Element AttentionPanel::Render() {
     // Render Grid
     Elements grid_rows;
 
-    // Header row of tokens
-    Elements top_tokens = { text("          ") }; // padding for y-axis token names
+    // Header row of tokens — format each label to be exactly 10 characters (padding and truncating)
+    Elements top_tokens = { text("          ") }; // padding for y-axis token names (10 spaces)
     for (int x = viewport_x_; x < std::min(viewport_x_ + view_size, seq_len); ++x) {
-        top_tokens.push_back(text("[" + tokens_[x] + "] ") | bold | color(Theme::TextWhite) | size(WIDTH, EQUAL, 10));
+        std::string tok = tokens_[x];
+        if (tok.size() > 7) tok = tok.substr(0, 7);
+        std::string label = "[" + tok + "]";
+        if (label.size() < 10) label.append(10 - label.size(), ' ');
+        top_tokens.push_back(text(label) | bold | color(Theme::TextWhite));
     }
     grid_rows.push_back(hbox(std::move(top_tokens)));
 
@@ -101,10 +109,12 @@ ftxui::Element AttentionPanel::Render() {
         default: pattern_name = "Sparse Semantic  [Abstract Context]"; heat_color = Color::RGB(230, 100, 180); break;
     }
 
-    // Heatmap rows
+    // Heatmap rows — format each y-axis label to be exactly 10 characters
     for (int y = viewport_y_; y < std::min(viewport_y_ + view_size, seq_len); ++y) {
         Elements row_els;
-        std::string y_tok = "[" + tokens_[y] + "]";
+        std::string tok = tokens_[y];
+        if (tok.size() > 7) tok = tok.substr(0, 7);
+        std::string y_tok = "[" + tok + "]";
         if (y_tok.size() < 10) y_tok.append(10 - y_tok.size(), ' ');
         row_els.push_back(text(y_tok) | bold | color(Theme::TextWhite));
 
@@ -138,8 +148,8 @@ ftxui::Element AttentionPanel::Render() {
                 }
                 default: { // Sparse semantic — complex wavy pattern
                     float raw = std::sin((float)x * (0.8f + 0.15f * head) +
-                                        (float)y * (1.3f + 0.20f * head) +
-                                        (float)layer * 2.1f);
+                                         (float)y * (1.3f + 0.20f * head) +
+                                         (float)layer * 2.1f);
                     weight = std::max(0.0f, (raw + 1.0f) / 2.0f - 0.10f);
                     // boost near-diagonal slightly for readability
                     if (std::abs(x - y) <= 1) weight = std::min(1.0f, weight + 0.25f);
@@ -166,7 +176,11 @@ ftxui::Element AttentionPanel::Render() {
               << "  |  Contrast: " << std::fixed << std::setprecision(1) << contrast_scale_ << "x";
 
     return vbox({
-        text("┌── 3. ATTENTION MATRIX VISUALIZER ────────────────────────────────────────────────────────────┐") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+        hbox({
+            text(" 3. ATTENTION MATRIX VISUALIZER ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            filler()
+        }),
+        separator(),
         hbox({
             text(" Pattern: ") | color(Theme::TextDim),
             text(pattern_name) | bold | color(heat_color),
@@ -175,7 +189,7 @@ ftxui::Element AttentionPanel::Render() {
         separator(),
         vbox(std::move(grid_rows)) | flex,
         separator(),
-        text("[Arrows/h,j,k,l: Pan | +/-: Adjust Contrast | H: Cycle Head | F: Fullscreen]") | color(Theme::TextDim) | size(HEIGHT, EQUAL, 1)
+        text(" [Arrows/h,j,k,l: Pan | +/-: Adjust Contrast | H: Cycle Head | F: Fullscreen]") | color(Theme::TextDim)
     }) | Theme::StyledBorder(Focused());
 }
 

@@ -30,7 +30,11 @@ ftxui::Element AnomalyPanel::Render() {
             ? "No anomalies detected. Model health is nominal."
             : "No anomalies detected for layer: " + layer_filter_;
         return vbox({
-            text("┌── 5. NUMERICAL ANOMALY LEDGER ──────────────────────┐") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+            hbox({
+                text(" 5. NUMERICAL ANOMALY LEDGER ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+                filler()
+            }),
+            separator(),
             text(empty_msg) | color(Theme::AccentGPU) | bold | center | flex
         }) | Theme::StyledBorder(Focused());
     }
@@ -88,9 +92,14 @@ ftxui::Element AnomalyPanel::Render() {
     }
 
     return vbox({
-        text("┌── 5. NUMERICAL ANOMALY LEDGER ──────────────────────┐") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+        hbox({
+            text(" 5. NUMERICAL ANOMALY LEDGER ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            filler()
+        }),
+        separator(),
         vbox(std::move(items)) | frame | vscroll_indicator | flex,
-        text(footer_txt) | color(Theme::TextDim) | size(HEIGHT, EQUAL, 1)
+        separator(),
+        text(" " + footer_txt) | color(Theme::TextDim)
     }) | Theme::StyledBorder(Focused());
 }
 

@@ -48,29 +48,41 @@ ftxui::Element TopologyPanel::Render() {
 
         Element item_el = text(indent + prefix + name);
 
-        if (node->is_active_target) {
-            item_el = hbox({
-                item_el | bold | color(Theme::BorderActive),
-                text("  [Active Capture Target]") | color(Theme::AccentGPU) | bold
-            });
-        } else if (i == selected_index_) {
+        // 1. Selection and focus styling
+        bool is_selected = (i == selected_index_);
+        if (is_selected) {
             item_el = item_el | focus;
             if (Focused()) {
                 item_el = item_el | color(Theme::TextWhite) | bold | bgcolor(Color::RGB(30, 41, 59));
             } else {
                 item_el = item_el | color(Theme::TextWhite) | bold;
             }
+        } else if (node->is_active_target) {
+            item_el = item_el | bold | color(Theme::BorderActive);
         } else {
             item_el = item_el | color(Theme::TextDim);
+        }
+
+        // 2. Active target tag
+        if (node->is_active_target) {
+            item_el = hbox({
+                item_el,
+                text("  [Active Capture Target]") | color(Theme::AccentGPU) | bold
+            });
         }
 
         items.push_back(item_el);
     }
 
     return vbox({
-        text("╔══ █ 1. MODEL TOPOLOGY ═══════════════╗") | bold | color(Focused() ? Theme::BorderActive : Theme::BorderMuted),
+        hbox({
+            text(" 1. MODEL TOPOLOGY ") | bold | color(Focused() ? Theme::BorderActive : Theme::TextWhite),
+            filler()
+        }),
+        separator(),
         vbox(std::move(items)) | frame | flex | vscroll_indicator,
-        text("[Press j/k to Navigate, Space to Expand/Collapse, Enter to Capture]") | color(Theme::TextDim) | size(HEIGHT, EQUAL, 1)
+        separator(),
+        text(" [j/k: Navigate | Space: Expand | Enter: Capture]") | color(Theme::TextDim)
     }) | Theme::StyledBorder(Focused());
 }
 
