@@ -113,5 +113,3 @@ Each `TelemetryRecord` contains:
 - Anomaly flags (NaN, Inf, CPU fallback)
 
 ---
-
-*Built for the Google Developer Student Clubs project.*
